@@ -30,10 +30,10 @@ struct node
 struct list_t
 {
     node* list_arr;
-    size_t size;
-    size_t capacity;
-    size_t head;
-    size_t tail;
+    ssize_t size;
+    ssize_t capacity;
+    ssize_t head;
+    ssize_t tail;
 
 };
 

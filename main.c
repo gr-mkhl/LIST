@@ -6,6 +6,7 @@ int main()
     list_t list = {};
 
     ListInit(&list, 10);
+
     AddToTail(&list, 1);
     PrintList(&list);
     AddToTail(&list, 2);
@@ -26,6 +27,8 @@ int main()
     PrintList(&list);
     DeleteFromHead(&list);
     PrintList(&list);
+
     ListDestroy(&list);
+
     return 0;
 }

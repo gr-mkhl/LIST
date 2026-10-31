@@ -8,13 +8,16 @@ lst_err ListInit( list_t* list, size_t init_capacity )
     list->list_arr = (node*)calloc(init_capacity, sizeof(node));
     if (list->list_arr == NULL)
         return LIST_OOM;
+
     list->capacity = init_capacity;
     list->size = 0;
-    for (size_t i = 1; i < list->capacity; i++)
+
+    for (ssize_t i = 1; i < list->capacity; i++)
     {
         list->list_arr[i].next = -1;
         list->list_arr[i].prev = -1;
     }
+
     list->list_arr[0].next = 0;
     list->list_arr[0].prev = 0;
     list->list_arr[0].data = POISON;
@@ -27,12 +30,13 @@ lst_err ListDestroy( list_t* list )
     if (list == NULL)
         return NULL_LIST_PTR;
 
-    for (size_t i = 0; i < list->capacity; i++)
+    for (ssize_t i = 0; i < list->capacity; i++)
     {
         list->list_arr[i].data = POISON;
-        list->list_arr[i].next = -1;
-        list->list_arr[i].prev = -1;
+        list->list_arr[i].next = POISON;
+        list->list_arr[i].prev = POISON;
     }
+
     list->capacity = 0;
     list->size = 0;
     free(list->list_arr);
@@ -61,7 +65,7 @@ lst_err AddToHead( list_t* list, data_t value )
     if ((status & ~(ALL_CORRECT | EMPTY_LIST)) != 0)
         return status;
 
-    for (size_t i = 0; i < list->capacity; i++)
+    for (ssize_t i = 0; i < list->capacity; i++)
     {
         if (list->list_arr[i].next == -1)
         {
@@ -84,7 +88,7 @@ lst_err AddToTail( list_t* list, data_t value )
     if ((status & ~(ALL_CORRECT | EMPTY_LIST)) != 0)
         return status;
 
-    for (size_t i = 0; i < list->capacity; i++)
+    for (ssize_t i = 0; i < list->capacity; i++)
     {
         if (list->list_arr[i].next == -1)
         {
@@ -157,7 +161,7 @@ void PrintList( list_t* list )
     printf("--------------------------------------------------------\n");
 
 
-    for (size_t id = list->list_arr[0].next; id != 0; id = list->list_arr[id].next)
+    for (ssize_t id = list->list_arr[0].next; id != 0; id = list->list_arr[id].next)
     {
         printf("[%zu]\t\t| %d\t\t| %zd\t\t| %zd\t\t\n",
                 id,
@@ -165,6 +169,7 @@ void PrintList( list_t* list )
                 list->list_arr[id].next,
                 list->list_arr[id].prev);
     }
+    printf("========================================================\n\n\n");
 }
 
 
