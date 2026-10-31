@@ -28,6 +28,7 @@ int main()
     DeleteFromHead(&list);
     PrintList(&list);
 
+
     ListDestroy(&list);
 
     return 0;

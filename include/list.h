@@ -14,11 +14,12 @@ typedef uint16_t lst_err;
 
 enum LST_ERR_MASK
 {
-    ALL_CORRECT   = 0x00,
-    NULL_LIST_PTR = 0x01,
-    EMPTY_LIST    = 0x02,
-    LIST_OVERFLOW = 0x04,
-    LIST_OOM      = 0x08
+    ALL_CORRECT    = 0x00,
+    NULL_LIST_PTR  = 0x01,
+    EMPTY_LIST     = 0x02,
+    LIST_OVERFLOW  = 0x04,
+    LIST_OOM       = 0x08,
+    NO_EMPTY_NODES = 0x10
 };
 struct node
 {
@@ -32,8 +33,7 @@ struct list_t
     node* list_arr;
     ssize_t size;
     ssize_t capacity;
-    ssize_t head;
-    ssize_t tail;
+    ssize_t first_empty_node;
 
 };
 
