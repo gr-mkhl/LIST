@@ -6,29 +6,12 @@ int main()
     list_t list = {};
 
     ListInit(&list, 10);
-
-    AddToTail(&list, 1);
+    AddToTail(&list, 7);
     PrintList(&list);
-    AddToTail(&list, 2);
+    for (int i = 0; i < 10; i++)
+        AddToTail(&list, i);
     PrintList(&list);
-    AddToHead(&list, 3);
-    PrintList(&list);
-    AddToTail(&list, 4);
-    PrintList(&list);
-    AddToTail(&list, 5);
-    PrintList(&list);
-    DeleteFromHead(&list);
-    PrintList(&list);
-    DeleteFromHead(&list);
-    PrintList(&list);
-    DeleteFromHead(&list);
-    PrintList(&list);
-    DeleteFromHead(&list);
-    PrintList(&list);
-    DeleteFromHead(&list);
-    PrintList(&list);
-
-
+    MakeGraph(&list);
     ListDestroy(&list);
 
     return 0;

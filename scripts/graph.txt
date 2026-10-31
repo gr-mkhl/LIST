@@ -1,0 +1,103 @@
+digraph
+{
+first_empty [shape=Mrecord; style = filled; fillcolor = "#ffc0ec"; color = "#e605e6f1";
+      label = " FIRST_EMPTY "; ]
+
+head [shape=Mrecord; style = filled; fillcolor = "#ffc0ec"; color = "#e605e6f1";
+      label = " HEAD "; ]
+
+tail [shape=Mrecord; style = filled; fillcolor = "#ffc0ec"; color = "#e605e6f1";
+      label = " TAIL "; ]
+
+node1 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 7 | <id> id = 1 | { <prev> prev = 0 | <next> next = 2 }"; ]
+
+node2 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 0 | <id> id = 2 | { <prev> prev = 1 | <next> next = 3 }"; ]
+
+node3 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 1 | <id> id = 3 | { <prev> prev = 2 | <next> next = 4 }"; ]
+
+node4 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 2 | <id> id = 4 | { <prev> prev = 3 | <next> next = 5 }"; ]
+
+node5 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 3 | <id> id = 5 | { <prev> prev = 4 | <next> next = 6 }"; ]
+
+node6 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 4 | <id> id = 6 | { <prev> prev = 5 | <next> next = 7 }"; ]
+
+node7 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 5 | <id> id = 7 | { <prev> prev = 6 | <next> next = 8 }"; ]
+
+node8 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 6 | <id> id = 8 | { <prev> prev = 7 | <next> next = 9 }"; ]
+
+node9 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 7 | <id> id = 9 | { <prev> prev = 8 | <next> next = 10 }"; ]
+
+node10 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 8 | <id> id = 10 | { <prev> prev = 9 | <next> next = 11 }"; ]
+
+node11 [shape=Mrecord; style = filled; fillcolor = "#C0FFC0"; color = "#008000";
+         label = "  <data> data = 9 | <id> id = 11 | { <prev> prev = 10 | <next> next = 0 }"; ]
+
+empty_node12 [shape=Mrecord; style = filled; fillcolor = "#da6262"; color = "#c50404";
+         label = " { <data> EMPTY | <id> id = 12 | <next> next = 13 }"; ]
+
+empty_node13 [shape=Mrecord; style = filled; fillcolor = "#da6262"; color = "#c50404";
+         label = " { <data> EMPTY | <id> id = 13 | <next> next = 14 }"; ]
+
+empty_node14 [shape=Mrecord; style = filled; fillcolor = "#da6262"; color = "#c50404";
+         label = " { <data> EMPTY | <id> id = 14 | <next> next = 15 }"; ]
+
+empty_node15 [shape=Mrecord; style = filled; fillcolor = "#da6262"; color = "#c50404";
+         label = " { <data> EMPTY | <id> id = 15 | <next> next = 16 }"; ]
+
+empty_node16 [shape=Mrecord; style = filled; fillcolor = "#da6262"; color = "#c50404";
+         label = " { <data> EMPTY | <id> id = 16 | <next> next = 17 }"; ]
+
+empty_node17 [shape=Mrecord; style = filled; fillcolor = "#da6262"; color = "#c50404";
+         label = " { <data> EMPTY | <id> id = 17 | <next> next = 18 }"; ]
+
+empty_node18 [shape=Mrecord; style = filled; fillcolor = "#da6262"; color = "#c50404";
+         label = " { <data> EMPTY | <id> id = 18 | <next> next = 19 }"; ]
+
+empty_node19 [shape=Mrecord; style = filled; fillcolor = "#da6262"; color = "#c50404";
+         label = " { <data> EMPTY | <id> id = 19 | <next> next = 20 }"; ]
+
+empty_node20 [shape=Mrecord; style = filled; fillcolor = "#da6262"; color = "#c50404";
+         label = " { <data> EMPTY | <id> id = 20 | <next> next = 0 }"; ]
+
+first_empty  -> empty_node12:id
+head         -> node1
+node11:next -> tail
+node1:next -> node2:id
+node11:prev -> node10:id
+node2:next -> node3:id
+node2:prev -> node1:id
+node3:next -> node4:id
+node3:prev -> node2:id
+node4:next -> node5:id
+node4:prev -> node3:id
+node5:next -> node6:id
+node5:prev -> node4:id
+node6:next -> node7:id
+node6:prev -> node5:id
+node7:next -> node8:id
+node7:prev -> node6:id
+node8:next -> node9:id
+node8:prev -> node7:id
+node9:next -> node10:id
+node9:prev -> node8:id
+node10:next -> node11:id
+node10:prev -> node9:id
+empty_node12:next -> empty_node13:id
+empty_node13:next -> empty_node14:id
+empty_node14:next -> empty_node15:id
+empty_node15:next -> empty_node16:id
+empty_node16:next -> empty_node17:id
+empty_node17:next -> empty_node18:id
+empty_node18:next -> empty_node19:id
+empty_node19:next -> empty_node20:id
+}
