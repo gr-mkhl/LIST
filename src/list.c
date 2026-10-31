@@ -1,4 +1,4 @@
-#include "list.h"
+#include <list.h>
 
 lst_err ListInit( list_t* list, size_t init_capacity )
 {
