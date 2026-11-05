@@ -8,7 +8,9 @@
 #include <stdint.h>
 
 typedef int      data_t;
+typedef ssize_t  iterator_t;
 typedef uint16_t lst_err;
+
 #define os           "%d"
 #define POISON       -67
 #define INIT_CAPACITY 16
@@ -22,17 +24,15 @@ enum LST_ERR_MASK
     EMPTY_LIST     = 0x04,
     LIST_OVERFLOW  = 0x08,
     LIST_OOM       = 0x10,
-    NO_EMPTY_NODES = 0x20,
-    CAPACITY_ERROR = 0x40,
-    SIZE_ERROR     = 0x80
-
+    CAPACITY_ERROR = 0x20,
+    SIZE_ERROR     = 0x40
 };
 
 struct node_t
 {
     data_t data;
-    ssize_t next;
-    ssize_t prev;
+    iterator_t next;
+    iterator_t prev;
 };
 
 struct list_t
@@ -40,22 +40,25 @@ struct list_t
     node_t* list_arr;
     ssize_t size;
     ssize_t capacity;
-    ssize_t first_empty_node;
-
+    iterator_t first_empty_iterator;
 };
 
-lst_err ListInit       ( list_t* list, ssize_t init_capacity );
-lst_err AddAfterId     ( list_t* list, ssize_t prev_id, data_t value );
-lst_err DeleteById     ( list_t* list, ssize_t id );
-//lst_err AddBeforeId  ( list_t* list, ssize_t next_id, data_t value );
-lst_err AddToTail      ( list_t* list, data_t value );
-lst_err AddToHead      ( list_t* list, data_t value );
-lst_err DeleteFromHead ( list_t* list );
-lst_err DeleteFromTail ( list_t* list );
-lst_err ListVerifier   ( list_t* list );
-lst_err ReallocListUp  ( list_t* list );
-lst_err ListDestroy    ( list_t* list );
-void PrintList         ( list_t* list );
-void MakeGraph         ( list_t* list );
+lst_err ListInit         ( list_t* list, ssize_t init_capacity );
+lst_err ListDestroy      ( list_t* list );
+iterator_t GetHead       ( list_t* list );
+iterator_t GetTail       ( list_t* list );
+iterator_t Next          ( list_t* list, iterator_t iterator );
+iterator_t Prev          ( list_t* list, iterator_t iterator );
+lst_err InsertAfter      ( list_t* list, iterator_t prev_iterator, data_t value );
+lst_err InsertBefore     ( list_t* list, iterator_t next_iterator, data_t value );
+lst_err InsertToHead     ( list_t* list, data_t value );
+lst_err InsertToTail     ( list_t* list, data_t value );
+lst_err DeleteByIterator ( list_t* list, iterator_t iterator_to_delete );
+lst_err DeleteFromHead   ( list_t* list );
+lst_err DeleteFromTail   ( list_t* list );
+lst_err ReallocListUp    ( list_t* list );
+lst_err ListVerifier     ( list_t* list );
+void PrintList           ( list_t* list );
+void MakeGraph           ( list_t* list );
 
 #endif
