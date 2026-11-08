@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <log.h>
 
 typedef int      data_t;
 typedef ssize_t  iterator_t;

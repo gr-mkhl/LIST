@@ -18,6 +18,8 @@ InsertToHead, InsertToTail, DeleteFromHead, DeleteFromTail ReallocListUp не я
 и вызываются функциями InsertAfter и InsertBefore
 */
 
+
+
 lst_err ListInit( list_t* list, ssize_t init_capacity )
 {
     if (list == NULL)
@@ -242,6 +244,7 @@ lst_err ListVerifier( list_t* list )
     return status;
 }
 
+
 lst_err InsertToHead( list_t* list, data_t value )
 {
     return InsertAfter(list, 0, value);
@@ -304,72 +307,100 @@ void PrintList( list_t* list )
 
 void MakeGraph( list_t* list ) //FIXME - переделать, чтоб элементы были в порядке возрастания индекса в массиве
 {
-    FILE* graph = fopen("scripts/graph.txt", "w");
+    char graph_file_name[70] = {};
+    char time_buffer[20] = {};
+    strcpy(time_buffer, FillTimeForNames());
+    snprintf(graph_file_name, 70, "graph_dump/graphdump%s", time_buffer);
+    strcat(graph_file_name, ".txt");
+
+    printf("%s\n", graph_file_name);
+    FILE* graph = fopen(graph_file_name, "w");
     assert(graph);
 
     fprintf(graph, "digraph\n");
     fprintf(graph, "{\n");
-    //fprintf(graph, "rankdir=LR\n");
+    fprintf(graph, "rankdir=LR\n");
 
-    fprintf(graph,
-        "first_empty [shape=Mrecord; style = filled; fillcolor = \"#ffc0ec\"; color = \"#e605e6f1\";\n"
-        "      label = \" FIRST_EMPTY \"; ]\n\n");
-    fprintf(graph,
-        "head [shape=Mrecord; style = filled; fillcolor = \"#ffc0ec\"; color = \"#e605e6f1\";\n"
-        "      label = \" HEAD \"; ]\n\n");
-    fprintf(graph,
-        "tail [shape=Mrecord; style = filled; fillcolor = \"#ffc0ec\"; color = \"#e605e6f1\";\n"
-        "      label = \" TAIL \"; ]\n\n");
-
-
-    for (ssize_t id = list->list_arr[0].next; id != 0; id = list->list_arr[id].next)
+    for (ssize_t id = 0; id < list->capacity - 1; id++)
     {
         fprintf(graph,
-        "node%zd [shape=Mrecord; style = filled; fillcolor = \"#C0FFC0\"; color = \"#008000\";\n"
-        "         label = \"  <data> data = %d | <id> id = %zd | { <prev> prev = %zd | <next> next = %zd }\"; ]\n\n",
-                  id, list->list_arr[id].data, id, list->list_arr[id].prev, list->list_arr[id].next);
-    }
-
-    for (ssize_t id = list->first_empty_iterator; id != 0; id = list->list_arr[id].next)
-    {
-        fprintf(graph,
-        "empty_node%zd [shape=Mrecord; style = filled; fillcolor = \"#da6262\"; color = \"#c50404\";\n"
-        "         label = \" { <data> EMPTY | <id> id = %zd | <next> next = %zd }\"; ]\n\n",
-                  id, id, list->list_arr[id].next);
-    }
-
-    ssize_t first_node = list->list_arr[0].next;
-    ssize_t last_node  = list->list_arr[0].prev;
-
-    fprintf(graph, "first_empty  -> empty_node%zd:id\n"
-                   "head         -> node%zd\n"
-                   "node%zd:next -> tail\n"
-                   "node%zd:next -> node%zd:id\n"
-                   "node%zd:prev -> node%zd:id\n",
-                    list->first_empty_iterator,
-                    first_node,
-                    last_node,
-                    first_node, list->list_arr[first_node].next,
-                    last_node , list->list_arr[last_node ].prev);
-
-
-    for (ssize_t id = list->list_arr[first_node].next; id != last_node; id = list->list_arr[id].next)
-    {
-        fprintf(graph,
-        "node%zd:next -> node%zd:id\n"
-        "node%zd:prev -> node%zd:id\n",
-        id, list->list_arr[id].next,
-        id, list->list_arr[id].prev);
+        "node%zd -> node%zd [style = invis, weight = 100];", id, id + 1);
     }
 
 
-    for (ssize_t id = list->first_empty_iterator; list->list_arr[id].next != 0; id = list->list_arr[id].next)
+    char fillcolor_str[15] = {};
+    char color_str[15] = {};
+
+    //инициализирует все элементы
+    for (ssize_t id = 0; id < list->capacity; id++)
     {
+        if (id == 0)
+        {
+            strcpy(fillcolor_str, "\"#999999\"");
+            strcpy(color_str, "\"#747474\"");
+        }
+        else if (list->list_arr[id].prev == -1)
+        {
+            strcpy(fillcolor_str, "\"#00eaff\"");
+            strcpy(color_str, "\"#00909d\"");
+        }
+        else if (list->list_arr[id].next < 0 || list->list_arr[id].prev < 0)
+        {
+            strcpy(fillcolor_str, "\"#ff0000\"");
+            strcpy(color_str, "\"#a80000\"");
+        }
+        else
+        {
+            strcpy(fillcolor_str, "\"#C0FFC0\"");
+            strcpy(color_str, "\"#008000\"");
+        }
+
         fprintf(graph,
-        "empty_node%zd:next -> empty_node%zd:id\n",
-        id, list->list_arr[id].next);
+        "node%zd [shape = record; style = filled; fillcolor = %s; color = %s;\n"
+        "         label = \"  <data> data = %d | <id> id = %zd | { <prev> prev = %zd | <next> next = %zd }\"; ]\n",
+                  id, fillcolor_str, color_str, list->list_arr[id].data, id, list->list_arr[id].prev, list->list_arr[id].next);
     }
+
+    char edge_style_str[15] = {};
+
+    //стрелочки next
+    fprintf(graph, "splines = true\n");
+
+    for (ssize_t id = 0; id < list->capacity; id++)
+    {
+        if (id == 0 || id == list->list_arr[0].prev)
+        {
+            strcpy(color_str, "\"#747474\"");
+            strcpy(edge_style_str, "solid");
+        }
+        else if (list->list_arr[id].prev == -1)
+        {
+            strcpy(color_str, "\"#00909d\"");
+            strcpy(edge_style_str, "solid");
+        }
+        else if (list->list_arr[id].next < 0 || list->list_arr[id].prev < 0)
+        {
+            strcpy(color_str, "\"#a80000\"");
+            strcpy(edge_style_str, "bold");
+        }
+        else
+        {
+            strcpy(color_str, "\"#008000\"");
+            strcpy(edge_style_str, "solid");
+        }
+
+        fprintf(graph, "node%zd:next:se -> node%zd:next:s [color = %s, style = %s, weigh = 0]\n",
+                id, list->list_arr[id].next, color_str, edge_style_str);
+    }
+
+
+
 
     fprintf(graph, "}");
     fclose(graph);
+
+    char system_command[150] = {};
+    snprintf(system_command, 150, "dot -Tpng %s -o graph_dump/graph_img%s.png", graph_file_name, time_buffer);
+    printf("%s\n", system_command);
+    system(system_command);
 }

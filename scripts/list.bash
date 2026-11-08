@@ -2,9 +2,9 @@
 
 cd "$(dirname "$0")/.." || exit
 
-if [ ! -d "build" ]; then
-    mkdir build
-fi
+rm -rf graph_dump
+
+mkdir -p graph_dump
 
 g++ -D _DEBUG -ggdb3 -std=c++17 -Wall -Wextra -Weffc++ -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations \
 -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported -Wconversion -Wctor-dtor-privacy -Wempty-body \
@@ -18,6 +18,6 @@ g++ -D _DEBUG -ggdb3 -std=c++17 -Wall -Wextra -Weffc++ -Waggressive-loop-optimiz
 -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,\
 integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr \
 -I include \
-src/list.c src/main.c -o build/list.out
+src/list.c src/main.c src/log.c -o build/list.out
 
 ./build/list.out
