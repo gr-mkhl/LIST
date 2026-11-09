@@ -19,14 +19,14 @@ typedef uint16_t lst_err;
 
 enum LST_ERR_MASK
 {
-    ALL_CORRECT    = 0x00,
-    INCORRECT_ARG  = 0x01,
-    NULL_LIST_PTR  = 0x02,
-    EMPTY_LIST     = 0x04,
-    LIST_OVERFLOW  = 0x08,
-    LIST_OOM       = 0x10,
-    CAPACITY_ERROR = 0x20,
-    SIZE_ERROR     = 0x40
+    ALL_CORRECT    = 0,
+    INCORRECT_ARG  = 1,
+    NULL_LIST_PTR  = 2,
+    EMPTY_LIST     = 3,
+    LIST_OVERFLOW  = 4,
+    LIST_OOM       = 5,
+    CAPACITY_ERROR = 6,
+    SIZE_ERROR     = 7
 };
 
 struct node_t
@@ -59,7 +59,5 @@ lst_err DeleteFromHead   ( list_t* list );
 lst_err DeleteFromTail   ( list_t* list );
 lst_err ReallocListUp    ( list_t* list );
 lst_err ListVerifier     ( list_t* list );
-void PrintList           ( list_t* list );
-void MakeGraph           ( list_t* list );
 
 #endif

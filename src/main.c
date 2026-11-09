@@ -1,8 +1,13 @@
 #define LOGGING
+
 #include <main.h>
 
 int main()
 {
+    #ifdef LOGGING
+    system("rm -rf logs; mkdir -p logs/htm; mkdir -p logs/img; mkdir -p logs/txt" );
+    STARTLOG()
+    #endif
 
     list_t list = {};
     data_t value = 0;
@@ -11,7 +16,6 @@ int main()
     iterator_t iterator = 0;
     int ch = 0;
 
-    ON_LOG(system("rm -rf graph_dump; mkdir -p graph_dump");)
 
     printf(MENU);
     while ((ch = getchar()) != 'q')
@@ -30,20 +34,20 @@ int main()
                     break;
                 }
                 iterator = GetHead(&list);
-                for (ssize_t i = 0; i < list_index; i++)
+                for (ssize_t i = 1; i < list_index; i++)
                     iterator = Next(&list, iterator);
                 InsertAfter(&list, iterator, value);
                 break;
             case '3':
                 scanf("%zd", &list_index);
                 iterator = GetHead(&list);
-                for (ssize_t i = 0; i < list_index; i++)
+                for (ssize_t i = 1; i < list_index; i++)
                     iterator = Next(&list, iterator);
                 DeleteByIterator(&list, iterator);
                 break;
             case '4':
-                PrintList(&list);
-                MakeGraph(&list);
+                FPrintList(&list, LOG_FILE);
+                GraphDump(&list);
                 break;
             case '5':
                 ListDestroy(&list);
@@ -56,8 +60,7 @@ int main()
         CleanBuffer();
     }
 
-    ON_LOG(system("rmdir --ignore-fail-on-non-empty graph_dump");)
-
+    ON_LOG(ENDLOG())
     return 0;
 }
 

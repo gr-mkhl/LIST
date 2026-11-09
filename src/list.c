@@ -1,3 +1,4 @@
+#define LOGGING
 #include <list.h>
 
 //----------------------------правила работы со списком--------------------------------------------------
@@ -53,30 +54,35 @@ lst_err ListInit( list_t* list, ssize_t init_capacity )
     list->list_arr[0].next = 0;
     list->list_arr[0].prev = 0;
 
+    ON_LOG(LOG("Список проинициализирован с параметром init_capacity = {%zd}", init_capacity))
     return ALL_CORRECT;
 }
 
 
 iterator_t GetHead( list_t* list )
 {
+    ON_LOG(LOG("На голову списка указывает итератор {%zd}", list->list_arr[0].next))
     return list->list_arr[0].next;
 }
 
 
 iterator_t GetTail( list_t* list )
 {
+    ON_LOG(LOG("На хвост списка указывает итератор {%zd}", list->list_arr[0].prev))
     return list->list_arr[0].prev;
 }
 
 
 iterator_t Next( list_t* list, iterator_t iterator )
 {
+    ON_LOG(LOG("На следующий элемент списка указывает итератор {%zd}", list->list_arr[iterator].next))
     return list->list_arr[iterator].next;
 }
 
 
 iterator_t Prev( list_t* list, iterator_t iterator )
 {
+    ON_LOG(LOG("На предыдущий элемент списка указывает итератор {%zd}", list->list_arr[iterator].prev))
     return list->list_arr[iterator].prev;
 }
 
@@ -105,6 +111,7 @@ lst_err ReallocListUp( list_t* list )
 // (capacity) инициализируются как первый "свободный"
     list->first_empty_iterator = list->capacity;
 
+    ON_LOG(LOG("Список расширен с capacity = {%zd} до new_capacity = {%zd}", list->capacity, new_capacity))
     list->capacity = new_capacity;
 
     return ALL_CORRECT;
@@ -130,7 +137,7 @@ lst_err DeleteByIterator( list_t* list, iterator_t iterator_to_delete )
     list->first_empty_iterator = iterator_to_delete;
 
     list->size--;
-
+    ON_LOG(LOG("Из списка удален элемент, на который указывал итератор {%zd}", iterator_to_delete))
     return ALL_CORRECT;
 }
 
@@ -167,6 +174,7 @@ lst_err InsertAfter( list_t* list, iterator_t prev_iterator, data_t value )
 
     list->size++;
 
+    ON_LOG(LOG("В список после элемента, на который указывает итератор {%zd}, добавлен элемент co значением {" os "}", prev_iterator, value))
     return ALL_CORRECT;
 }
 
@@ -202,7 +210,7 @@ lst_err InsertBefore( list_t* list, iterator_t next_iterator, data_t value )
     list->list_arr[next_iterator].prev = new_node_iterator;
 
     list->size++;
-
+    ON_LOG(LOG("В список перед элементом, на который указывает итератор {%zd}, добавлен элемент co значением {" os "}", next_iterator, value))
     return ALL_CORRECT;
 }
 
@@ -224,24 +232,22 @@ lst_err ListDestroy( list_t* list )
     list->size = POISON;
 
     free(list->list_arr);
-
+    ON_LOG(LOG("Список удален"))
     return ALL_CORRECT;
 }
 
 lst_err ListVerifier( list_t* list )
 {
-    lst_err status = ALL_CORRECT;
-
     if (list == NULL)
-        status |= NULL_LIST_PTR;
-    if (list->capacity <= 0)
-        status |= CAPACITY_ERROR;
-    if (list->size < 0)
-        status |= SIZE_ERROR;
-    if (list->size >= list->capacity)
-        status |= LIST_OVERFLOW;
-
-    return status;
+        return NULL_LIST_PTR;
+    else if (list->capacity <= 0)
+        return CAPACITY_ERROR;
+    else if (list->size < 0)
+        return SIZE_ERROR;
+    else if (list->size >= list->capacity)
+        return LIST_OVERFLOW;
+    else
+        return ALL_CORRECT;
 }
 
 
@@ -260,147 +266,8 @@ lst_err DeleteFromHead( list_t* list )
     return DeleteByIterator(list, list->list_arr[0].next);
 }
 
-
-
 lst_err DeleteFromTail( list_t* list )
 {
    return DeleteByIterator(list, list->list_arr[0].prev);
 }
 
-
-void PrintList( list_t* list )
-{
-    printf("__list__\n");
-    printf("========================================================\n");
-    printf("size: %zd\ncapacity: %zd\nhead: %zd\ntail: %zd\nfirst_empty: %zd\n",
-            list->size,
-            list->capacity,
-            list->list_arr[0].next,
-            list->list_arr[0].prev,
-            list->first_empty_iterator);
-    printf("--------------------------------------------------------\n");
-
-    printf("index\t\t| data\t\t| next\t\t| prev\t\t\n");
-    printf("--------------------------------------------------------\n");
-
-
-    // for (ssize_t iterator = list->list_arr[0].next; iterator != 0; iterator = list->list_arr[iterator].next)
-    // {
-    //     printf("[%zd]\t\t| %d\t\t| %zd\t\t| %zd\t\t\n",
-    //             iterator,
-    //             list->list_arr[iterator].data,
-    //             list->list_arr[iterator].next,
-    //             list->list_arr[iterator].prev);
-    // }
-
-    for (ssize_t id = 0; id < list->capacity; id++)
-    {
-        printf("[%zd]\t\t| %d\t\t| %zd\t\t| %zd\t\t\n",
-                id,
-                list->list_arr[id].data,
-                list->list_arr[id].next,
-                list->list_arr[id].prev);
-    }
-
-    printf("========================================================\n\n\n");
-}
-
-void MakeGraph( list_t* list ) //FIXME - переделать, чтоб элементы были в порядке возрастания индекса в массиве
-{
-    char graph_file_name[70] = {};
-    char time_buffer[20] = {};
-    strcpy(time_buffer, FillTimeForNames());
-    snprintf(graph_file_name, 70, "graph_dump/graphdump%s", time_buffer);
-    strcat(graph_file_name, ".txt");
-
-    printf("%s\n", graph_file_name);
-    FILE* graph = fopen(graph_file_name, "w");
-    assert(graph);
-
-    fprintf(graph, "digraph\n");
-    fprintf(graph, "{\n");
-    fprintf(graph, "rankdir=LR\n");
-
-    for (ssize_t id = 0; id < list->capacity - 1; id++)
-    {
-        fprintf(graph,
-        "node%zd -> node%zd [style = invis, weight = 100];", id, id + 1);
-    }
-
-
-    char fillcolor_str[15] = {};
-    char color_str[15] = {};
-
-    //инициализирует все элементы
-    for (ssize_t id = 0; id < list->capacity; id++)
-    {
-        if (id == 0)
-        {
-            strcpy(fillcolor_str, "\"#999999\"");
-            strcpy(color_str, "\"#747474\"");
-        }
-        else if (list->list_arr[id].prev == -1)
-        {
-            strcpy(fillcolor_str, "\"#00eaff\"");
-            strcpy(color_str, "\"#00909d\"");
-        }
-        else if (list->list_arr[id].next < 0 || list->list_arr[id].prev < 0)
-        {
-            strcpy(fillcolor_str, "\"#ff0000\"");
-            strcpy(color_str, "\"#a80000\"");
-        }
-        else
-        {
-            strcpy(fillcolor_str, "\"#C0FFC0\"");
-            strcpy(color_str, "\"#008000\"");
-        }
-
-        fprintf(graph,
-        "node%zd [shape = record; style = filled; fillcolor = %s; color = %s;\n"
-        "         label = \"  <data> data = %d | <id> id = %zd | { <prev> prev = %zd | <next> next = %zd }\"; ]\n",
-                  id, fillcolor_str, color_str, list->list_arr[id].data, id, list->list_arr[id].prev, list->list_arr[id].next);
-    }
-
-    char edge_style_str[15] = {};
-
-    //стрелочки next
-    fprintf(graph, "splines = true\n");
-
-    for (ssize_t id = 0; id < list->capacity; id++)
-    {
-        if (id == 0 || id == list->list_arr[0].prev)
-        {
-            strcpy(color_str, "\"#747474\"");
-            strcpy(edge_style_str, "solid");
-        }
-        else if (list->list_arr[id].prev == -1)
-        {
-            strcpy(color_str, "\"#00909d\"");
-            strcpy(edge_style_str, "solid");
-        }
-        else if (list->list_arr[id].next < 0 || list->list_arr[id].prev < 0)
-        {
-            strcpy(color_str, "\"#a80000\"");
-            strcpy(edge_style_str, "bold");
-        }
-        else
-        {
-            strcpy(color_str, "\"#008000\"");
-            strcpy(edge_style_str, "solid");
-        }
-
-        fprintf(graph, "node%zd:next:se -> node%zd:next:s [color = %s, style = %s, weigh = 0]\n",
-                id, list->list_arr[id].next, color_str, edge_style_str);
-    }
-
-
-
-
-    fprintf(graph, "}");
-    fclose(graph);
-
-    char system_command[150] = {};
-    snprintf(system_command, 150, "dot -Tpng %s -o graph_dump/graph_img%s.png", graph_file_name, time_buffer);
-    printf("%s\n", system_command);
-    system(system_command);
-}

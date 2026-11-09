@@ -1,3 +1,5 @@
+:: //NOTE - устарел
+
 @echo off
 
 cd /d "%~dp0.."

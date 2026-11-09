@@ -1,4 +1,4 @@
-#include "log.h"
+#include <log.h>
 
 FILE* LOG_FILE = NULL;
 char time_buffer[50] = {};
@@ -7,8 +7,21 @@ char time_buffer[50] = {};
 void StartLog( const char* filename, const char* func, int line )
 {
     LOG_FILE = fopen(LOG_FILENAME, "w");
+    assert(LOG_FILE);
+    fprintf(LOG_FILE, "<pre>\n");
+    fprintf(LOG_FILE, "[%s] LOG_FILE opened in %s:%s:%d\n", FillTime(), filename, func, line);
 
-    fprintf(LOG_FILE, "%s: LOG_FILE opened in %s:%s:%d\n", FillTime(), filename, func, line);
+    fclose(LOG_FILE);
+}
+
+void Log( const char* str )
+{
+    LOG_FILE = fopen(LOG_FILENAME, "a");
+    assert(LOG_FILE);
+
+    fprintf(LOG_FILE, "%s\n", str);
+
+    fclose(LOG_FILE);
 }
 
 char* FillTime()
@@ -43,7 +56,10 @@ char* FillTimeForNames()
 
 void EndLog( const char* filename, const char* func, int line )
 {
-    fprintf(LOG_FILE, "%s: LOG_FILE closed in %s:%s:%d\n", FillTime(), filename, func, line);
+    LOG_FILE = fopen(LOG_FILENAME, "a");
+    assert(LOG_FILE);
+
+    fprintf(LOG_FILE, "[%s] LOG_FILE closed in %s:%s:%d\n", FillTime(), filename, func, line);
 
     fclose(LOG_FILE);
 }
