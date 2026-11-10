@@ -1,7 +1,11 @@
 #ifndef _LIST_DUMP_H_
 #define _LIST_DUMP_H_
 
-#include <list.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <log.h>
+#include <list_struct.h>
 
 #define color_lightgray  "\"#999999\""
 #define color_gray       "\"#747474\""

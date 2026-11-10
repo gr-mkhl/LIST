@@ -3,7 +3,7 @@
 
 //----------------------------правила работы со списком--------------------------------------------------
 /*
-элементы в списке нумеруются с 1, т.е. 1, 2, 3, ...; 0 - технический элемент
+элементы в списке нумеруются с 1, т.е. 1, 2, 3, ...; 0 - "технический" элемент
 capacity включает в себя 0-элемент
 size не  включает в себя 0-элемент
 max(size) = capacity - 1
@@ -19,7 +19,21 @@ InsertToHead, InsertToTail, DeleteFromHead, DeleteFromTail ReallocListUp не я
 и вызываются функциями InsertAfter и InsertBefore
 */
 
-
+const char* list_errors[] =
+{
+    [ALL_CORRECT]         = "List is correct",
+    [INCORRECT_ARG]       = "Incorrect argument",
+    [NULL_LIST_PTR]       = "Pointer to list is NULL",
+    [EMPTY_LIST]          = "List is empty: size = 0",
+    [LIST_OVERFLOW]       = "List isoverflow: size > capacity",
+    [LIST_OOM]            = "List is out of memory: reallocation failed",
+    [CAPACITY_ERROR]      = "Incorrect list capacity: capacity < 0",
+    [SIZE_ERROR]          = "Incorrect list size: size < 0",
+    [LINK_ERROR]          = "List double-link error: next(prev(A)) != A",
+    [CYCLE_NEXT_ERROR]    = "Next-link cycle error",
+    [CYCLE_PREV_ERROR]    = "Prev-link cycle error",
+    [HASH_CORRUPTED]      = "Hash has been corrupted"
+};
 
 lst_err ListInit( list_t* list, ssize_t init_capacity )
 {
@@ -54,10 +68,22 @@ lst_err ListInit( list_t* list, ssize_t init_capacity )
     list->list_arr[0].next = 0;
     list->list_arr[0].prev = 0;
 
+    CalcListHash(list);
+
     ON_LOG(LOG("Список проинициализирован с параметром init_capacity = {%zd}", init_capacity))
+    ON_LOG(GraphDump(list);)
+
     return ALL_CORRECT;
 }
 
+uint64_t CalcListHash( list_t* list )
+{
+    uint64_t struct_hash = Hash_djb2(list, sizeof(list_t) - sizeof(uint64_t));
+    uint64_t array_hash  = Hash_djb2(&list->list_arr[0], (size_t)list->capacity * sizeof(node_t));
+    list->list_hash = struct_hash ^ array_hash;
+
+    return struct_hash ^ array_hash;
+}
 
 iterator_t GetHead( list_t* list )
 {
@@ -111,14 +137,21 @@ lst_err ReallocListUp( list_t* list )
 // (capacity) инициализируются как первый "свободный"
     list->first_empty_iterator = list->capacity;
 
-    ON_LOG(LOG("Список расширен с capacity = {%zd} до new_capacity = {%zd}", list->capacity, new_capacity))
     list->capacity = new_capacity;
+
+    CalcListHash(list);
+
+    ON_LOG(LOG("Список расширен с capacity = {%zd} до new_capacity = {%zd}", list->capacity / 2, new_capacity))
+    ON_LOG(GraphDump(list);)
 
     return ALL_CORRECT;
 }
 
 lst_err DeleteByIterator( list_t* list, iterator_t iterator_to_delete )
 {
+    if (list->size == 0)
+        return EMPTY_LIST;
+
     if (!(0 < iterator_to_delete && iterator_to_delete <= list->size))
         return INCORRECT_ARG;
 
@@ -137,7 +170,12 @@ lst_err DeleteByIterator( list_t* list, iterator_t iterator_to_delete )
     list->first_empty_iterator = iterator_to_delete;
 
     list->size--;
+
+    CalcListHash(list);
+
     ON_LOG(LOG("Из списка удален элемент, на который указывал итератор {%zd}", iterator_to_delete))
+    ON_LOG(GraphDump(list);)
+
     return ALL_CORRECT;
 }
 
@@ -174,7 +212,11 @@ lst_err InsertAfter( list_t* list, iterator_t prev_iterator, data_t value )
 
     list->size++;
 
+    CalcListHash(list);
+
     ON_LOG(LOG("В список после элемента, на который указывает итератор {%zd}, добавлен элемент co значением {" os "}", prev_iterator, value))
+    ON_LOG(GraphDump(list);)
+
     return ALL_CORRECT;
 }
 
@@ -210,7 +252,12 @@ lst_err InsertBefore( list_t* list, iterator_t next_iterator, data_t value )
     list->list_arr[next_iterator].prev = new_node_iterator;
 
     list->size++;
+
+    CalcListHash(list);
+
     ON_LOG(LOG("В список перед элементом, на который указывает итератор {%zd}, добавлен элемент co значением {" os "}", next_iterator, value))
+    ON_LOG(GraphDump(list);)
+
     return ALL_CORRECT;
 }
 
@@ -231,8 +278,12 @@ lst_err ListDestroy( list_t* list )
     list->capacity = POISON;
     list->size = POISON;
 
+    list->list_hash = 0;
+
     free(list->list_arr);
+
     ON_LOG(LOG("Список удален"))
+
     return ALL_CORRECT;
 }
 
@@ -246,8 +297,31 @@ lst_err ListVerifier( list_t* list )
         return SIZE_ERROR;
     else if (list->size >= list->capacity)
         return LIST_OVERFLOW;
-    else
-        return ALL_CORRECT;
+    else if (list->list_hash != CalcListHash(list))
+        return HASH_CORRUPTED;
+
+    for (ssize_t j = 0, i = 0; j < list->size + 1; j++)
+    {
+        if (list->list_arr[list->list_arr[i].next].prev != i)
+            return LINK_ERROR;
+        i = list->list_arr[i].next;
+    }
+
+    ssize_t start   = 0;
+    ssize_t current = 0;
+
+    for (ssize_t i = 0; i < list->size + 1; i++)
+        current = list->list_arr[current].next;
+    if (current != start)
+        return CYCLE_NEXT_ERROR;
+
+    current = 0;
+    for (ssize_t i = 0; i < list->size + 1; i++)
+        current = list->list_arr[current].prev;
+    if (current != start)
+        return CYCLE_PREV_ERROR;
+
+    return ALL_CORRECT;
 }
 
 
@@ -271,3 +345,25 @@ lst_err DeleteFromTail( list_t* list )
    return DeleteByIterator(list, list->list_arr[0].prev);
 }
 
+//used hash algorithm djb2: https://dev.to/doogal/djb2-hash-function-string-to-integer-algorithm-explained-4bii?ysclid=mur1ep12vp401464212
+uint64_t Hash_djb2( const void* beg, size_t len )
+{
+    uint64_t hash = 5381;
+
+    for (const uint8_t* i = (const uint8_t*)beg; i < (const uint8_t*)beg + len; i++)
+        hash = (hash << 5) + hash + *i;
+    return hash;
+}
+
+uint64_t Hash_djb2_Except( const void* beg, const void* end, const void* except, size_t except_el_size )
+{
+    uint64_t hash = 5381;
+
+    for (const uint8_t* i = (const uint8_t*)beg; i <= end; i++)
+    {
+        if (i == except)
+            i += except_el_size;
+        hash =  (hash << 5) + hash + *i;
+    }
+    return hash;
+}

@@ -24,7 +24,7 @@ int main()
         {
             case '1':
                 scanf("%zd", &capacity);
-                ListInit(&list, capacity);
+                printf("\n\n%s\n\n", list_errors[ListInit(&list, capacity)]);
                 break;
             case '2':
                 scanf(os "%zd", &value, &list_index);
@@ -36,22 +36,40 @@ int main()
                 iterator = GetHead(&list);
                 for (ssize_t i = 1; i < list_index; i++)
                     iterator = Next(&list, iterator);
-                InsertAfter(&list, iterator, value);
+                printf("\n\n%s\n\n", list_errors[InsertAfter(&list, iterator, value)]);
                 break;
             case '3':
                 scanf("%zd", &list_index);
+                if (list_index > list.size || list_index <= 0)
+                {
+                    printf("Incorrect index to delete\n");
+                    break;
+                }
                 iterator = GetHead(&list);
                 for (ssize_t i = 1; i < list_index; i++)
                     iterator = Next(&list, iterator);
-                DeleteByIterator(&list, iterator);
+                printf("\n\n%s\n\n", list_errors[DeleteByIterator(&list, iterator)]);
                 break;
             case '4':
                 FPrintList(&list, LOG_FILE);
                 GraphDump(&list);
                 break;
             case '5':
-                ListDestroy(&list);
+                printf("\n\n%s\n\n", list_errors[ListDestroy(&list)]);
                 break;
+            case 't':
+            {
+                int result = StartTestSystem();
+                if (result == -1)
+                {
+                    printf("Tests completed correctly\n");
+                }
+                else
+                {
+                    printf("Test %d failed\n", result);
+                }
+                break;
+            }
             default:
                 printf("Invalid input\n");
                 break;

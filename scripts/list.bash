@@ -14,6 +14,6 @@ g++ -D _DEBUG -ggdb3 -std=c++17 -Wall -Wextra -Weffc++ -Waggressive-loop-optimiz
 -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,\
 integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr \
 -I include \
-src/list.c src/main.c src/log.c src/list_dump.c -o build/list.out
-
+src/list.c src/main.c src/log.c src/list_dump.c src/tests.c -o build/list.out
+export ASAN_OPTIONS=allocator_may_return_null=1
 ./build/list.out

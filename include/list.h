@@ -4,45 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <log.h>
+#include <list_struct.h>
+#include <list_dump.h>
 
-typedef int      data_t;
-typedef ssize_t  iterator_t;
-typedef uint16_t lst_err;
-
-#define os           "%d"
-#define POISON       -67
-#define INIT_CAPACITY 16
-
-
-enum LST_ERR_MASK
-{
-    ALL_CORRECT    = 0,
-    INCORRECT_ARG  = 1,
-    NULL_LIST_PTR  = 2,
-    EMPTY_LIST     = 3,
-    LIST_OVERFLOW  = 4,
-    LIST_OOM       = 5,
-    CAPACITY_ERROR = 6,
-    SIZE_ERROR     = 7
-};
-
-struct node_t
-{
-    data_t data;
-    iterator_t next;
-    iterator_t prev;
-};
-
-struct list_t
-{
-    node_t* list_arr;
-    ssize_t size;
-    ssize_t capacity;
-    iterator_t first_empty_iterator;
-};
 
 lst_err ListInit         ( list_t* list, ssize_t init_capacity );
 lst_err ListDestroy      ( list_t* list );
@@ -59,5 +24,9 @@ lst_err DeleteFromHead   ( list_t* list );
 lst_err DeleteFromTail   ( list_t* list );
 lst_err ReallocListUp    ( list_t* list );
 lst_err ListVerifier     ( list_t* list );
+
+uint64_t Hash_djb2   ( const void* beg, size_t len );
+uint64_t Hash_djb2_Except( const void* beg, const void* end, const void* except, size_t except_el_size );
+uint64_t CalcListHash( list_t* list );
 
 #endif

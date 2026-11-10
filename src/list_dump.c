@@ -40,7 +40,6 @@ void GraphDump( list_t* list )
     strcpy(time_buffer, FillTimeForNames());
     snprintf(graph_file_name, 70, "logs/txt/graph_dot_code%s.txt", time_buffer);
 
-    printf("%s\n", graph_file_name);
     FILE* graph = fopen(graph_file_name, "w");
     assert(graph);
 
@@ -156,12 +155,11 @@ void GraphDump( list_t* list )
     fclose(graph);
 
     char command[150] = {};
-    snprintf(command, 150, "dot -Tpng %s -o logs/img/graph_img%s.png", graph_file_name, time_buffer);
-    printf("%s\n", command);
+    snprintf(command, 150, "dot -Tsvg %s -o logs/img/graph_img%s.svg", graph_file_name, time_buffer);
     system(command);
 
     #ifdef LOGGING
-    snprintf(command, 150, "<img src = ../img/graph_img%s.png width = 1500px>", time_buffer);
+    snprintf(command, 150, "<img src = ../img/graph_img%s.svg>", time_buffer);
     Log(command);
     #endif
 }
