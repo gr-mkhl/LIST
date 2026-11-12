@@ -25,7 +25,7 @@ int main()
                 printf("\n\n%s\n\n", list_errors[ListInit(&list, capacity)]);
                 break;
             case '2':
-                scanf(os "%zd", &value, &list_index);
+                scanf(format_specifier "%zd", &value, &list_index);
                 if (list_index > list.size || list_index < 0)
                 {
                     printf("Incorrect index to insert\n");
@@ -57,15 +57,17 @@ int main()
                 break;
             case 't':
             {
-                int result = StartTestSystem();
-                if (result == -1)
-                {
-                    printf("Tests completed correctly\n");
-                }
-                else
-                {
-                    printf("Test %d failed\n", result);
-                }
+                ListDumpTest();
+                    printf("CPP standart version: %ld\n", __cplusplus);
+                // int result = StartTestSystem();
+                // if (result == -1)
+                // {
+                //     printf("Tests completed correctly\n");
+                // }
+                // else
+                // {
+                //     printf("Test %d failed\n", result);
+                // }
                 break;
             }
             default:

@@ -91,11 +91,15 @@ lst_err ListDumpTest()
 {
     list_t list = {};
     ListInit(&list, 10);
-    for (ssize_t i = 0; i < 10; i++)
+    for (ssize_t i = 0; i < 5; i++)
     {
         InsertAfter(&list, i, 1);
         InsertAfter(&list, i + 1, 2);
         DeleteByIterator(&list, i);
+    }
+    for (ssize_t i = 0; i < 2; i++)
+    {
+        DeleteByIterator(&list, 2 * i);
     }
     ListDestroy(&list);
     return (lst_err)1;

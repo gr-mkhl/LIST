@@ -229,7 +229,7 @@ lst_err InsertAfter( list_t* list, iterator_t prev_iterator, data_t value )
 
     CalcListHash(list);
 
-    ON_LOG(LOG("В список после элемента, на который указывает итератор {%zd}, добавлен элемент co значением {" os "}", prev_iterator, value))
+    ON_LOG(LOG("В список после элемента, на который указывает итератор {%zd}, добавлен элемент co значением {" format_specifier "}", prev_iterator, value))
 
     #ifdef DEBUGGING
     status = ListVerifier(list);
@@ -280,7 +280,7 @@ lst_err InsertBefore( list_t* list, iterator_t next_iterator, data_t value )
 
     CalcListHash(list);
 
-    ON_LOG(LOG("В список перед элементом, на который указывает итератор {%zd}, добавлен элемент co значением {" os "}", next_iterator, value))
+    ON_LOG(LOG("В список перед элементом, на который указывает итератор {%zd}, добавлен элемент co значением {" format_specifier "}", next_iterator, value))
 
     #ifdef DEBUGGING
     status = ListVerifier(list);

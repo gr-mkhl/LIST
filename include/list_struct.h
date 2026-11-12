@@ -5,12 +5,14 @@
 #include <stdint.h>
 
 typedef int      data_t;
+#define format_specifier  "%d"
+
+
 typedef ssize_t  iterator_t;
 
-#define os           "%d"
 
-#define POISON       -67
-#define INIT_CAPACITY 16
+#define POISON            -67
+#define INIT_CAPACITY      16
 
 #ifdef DEBUGGING
     #define ON_DBG(...) __VA_ARGS__
@@ -38,7 +40,7 @@ extern const char* list_errors[];
 
 struct node_t
 {
-    data_t data;
+    data_t     data;
     iterator_t next;
     iterator_t prev;
 };

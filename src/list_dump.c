@@ -22,7 +22,7 @@ void FPrintList( list_t* list, FILE* file, const char* filename )
 
     for (ssize_t id = 0; id < list->capacity; id++)
     {
-        fprintf(file, "[%zd]\t\t| %d\t\t| %zd\t\t| %zd\t\t\n",
+        fprintf(file, "[%zd]\t\t| " format_specifier "\t\t| %zd\t\t| %zd\t\t\n",
                 id,
                 list->list_arr[id].data,
                 list->list_arr[id].next,
@@ -92,7 +92,7 @@ void GraphDump( list_t* list )
 
         fprintf(graph,
         "node%zd [shape = Mrecord; style = filled; fillcolor = %s; color = %s;\n"
-        "         label = \" { data = %d | id = %zd | { next = %zd | prev = %zd } }\"; ]\n",
+        "         label = \" { data = " format_specifier " | id = %zd | { next = %zd | prev = %zd } }\"; ]\n",
                   id, fillcolor_str, color_str,
                   list->list_arr[id].data, id, list->list_arr[id].next, list->list_arr[id].prev);
     }
