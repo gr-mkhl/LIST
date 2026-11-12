@@ -171,4 +171,4 @@ sudo apt install graphviz
 Файл с логами находится по пути `/logs/htm/LOG.htm`.
 
 Пример того, как выглядит файл с логами:
-![log_example.htm](/images/log_example.htm)
+![log.png](/images/log.png)
