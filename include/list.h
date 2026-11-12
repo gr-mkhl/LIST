@@ -26,7 +26,6 @@ lst_err ReallocListUp    ( list_t* list );
 lst_err ListVerifier     ( list_t* list );
 
 uint64_t Hash_djb2   ( const void* beg, size_t len );
-uint64_t Hash_djb2_Except( const void* beg, const void* end, const void* except, size_t except_el_size );
 uint64_t CalcListHash( list_t* list );
 
 #endif

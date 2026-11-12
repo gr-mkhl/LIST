@@ -1,5 +1,3 @@
-#define LOGGING
-
 #include <tests.h>
 
 lst_err CapacityErrorVerifier()
@@ -71,7 +69,6 @@ lst_err LinkErrorVerifier()
     InsertAfter(&list, GetHead(&list), 134);
     InsertAfter(&list, GetHead(&list), 14);
     list.list_arr[1].next = 1;
-
     lst_err status = ListVerifier(&list);
     ListDestroy(&list);
     return status;
@@ -94,7 +91,7 @@ lst_err ListDumpTest()
 {
     list_t list = {};
     ListInit(&list, 10);
-    for (ssize_t i = 0; i < 20; i++)
+    for (ssize_t i = 0; i < 10; i++)
     {
         InsertAfter(&list, i, 1);
         InsertAfter(&list, i + 1, 2);

@@ -1,4 +1,3 @@
-#define LOGGING
 #include <list.h>
 
 //----------------------------правила работы со списком--------------------------------------------------
@@ -14,9 +13,9 @@ max(size) = capacity - 1
 пользователю предлагается пользоваться следующим интерфейсом:
 ListInit, InsertAfter, InsertBefore, DeleteByIterator, ListDestroy, Next, Prev, GetHead, GetTail
 
-InsertToHead, InsertToTail, DeleteFromHead, DeleteFromTail ReallocListUp не являются интерфейсом списка и
-не содержат в себе проверок на корректность построения списка для исключения повторных проверок
-и вызываются функциями InsertAfter и InsertBefore
+ReallocListUp не являeтся интерфейсом списка и
+не содержит в себе проверок на корректность построения списка для исключения повторных проверок.
+
 */
 
 const char* list_errors[] =
@@ -142,7 +141,14 @@ lst_err ReallocListUp( list_t* list )
     CalcListHash(list);
 
     ON_LOG(LOG("Список расширен с capacity = {%zd} до new_capacity = {%zd}", list->capacity / 2, new_capacity))
-    ON_LOG(GraphDump(list);)
+
+    #ifdef DEBUGGING
+    lst_err status = ListVerifier(list);
+    if (status != ALL_CORRECT)
+        return status;
+    else
+      ON_LOG(GraphDump(list));
+    #endif
 
     return ALL_CORRECT;
 }
@@ -174,7 +180,14 @@ lst_err DeleteByIterator( list_t* list, iterator_t iterator_to_delete )
     CalcListHash(list);
 
     ON_LOG(LOG("Из списка удален элемент, на который указывал итератор {%zd}", iterator_to_delete))
-    ON_LOG(GraphDump(list);)
+
+    #ifdef DEBUGGING
+    status = ListVerifier(list);
+    if (status != ALL_CORRECT)
+        return status;
+    else
+      ON_LOG(GraphDump(list));
+    #endif
 
     return ALL_CORRECT;
 }
@@ -184,15 +197,17 @@ lst_err InsertAfter( list_t* list, iterator_t prev_iterator, data_t value )
     if (!(0 <= prev_iterator && prev_iterator <= list->size))
         return INCORRECT_ARG;
 
+    #ifdef DEBUGGING
     lst_err status = ListVerifier(list);
     if (status != ALL_CORRECT)
         return status;
+    #endif
 
     if (list->size == list->capacity - 1)
     {
-        status = ReallocListUp(list);
-        if (status != ALL_CORRECT)
-            return status;
+        lst_err realloc_status = ReallocListUp(list);
+        if (realloc_status != ALL_CORRECT)
+            return realloc_status;
     }
 
     iterator_t next_iterator = list->list_arr[prev_iterator].next;
@@ -215,7 +230,14 @@ lst_err InsertAfter( list_t* list, iterator_t prev_iterator, data_t value )
     CalcListHash(list);
 
     ON_LOG(LOG("В список после элемента, на который указывает итератор {%zd}, добавлен элемент co значением {" os "}", prev_iterator, value))
-    ON_LOG(GraphDump(list);)
+
+    #ifdef DEBUGGING
+    status = ListVerifier(list);
+    if (status != ALL_CORRECT)
+        return status;
+    else
+      ON_LOG(GraphDump(list));
+    #endif
 
     return ALL_CORRECT;
 }
@@ -225,15 +247,18 @@ lst_err InsertBefore( list_t* list, iterator_t next_iterator, data_t value )
     if (!(0 <= next_iterator && next_iterator <= list->size))
         return INCORRECT_ARG;
 
+    #ifdef DEBUGGING
     lst_err status = ListVerifier(list);
     if (status != ALL_CORRECT)
         return status;
+    #endif
 
     if (list->size == list->capacity - 1)
     {
-        status = ReallocListUp(list);
-        if (status != ALL_CORRECT)
-            return status;
+
+        lst_err realloc_status = ReallocListUp(list);
+        if (realloc_status != ALL_CORRECT)
+            return realloc_status;
     }
 
     iterator_t prev_iterator = list->list_arr[next_iterator].prev;
@@ -256,7 +281,14 @@ lst_err InsertBefore( list_t* list, iterator_t next_iterator, data_t value )
     CalcListHash(list);
 
     ON_LOG(LOG("В список перед элементом, на который указывает итератор {%zd}, добавлен элемент co значением {" os "}", next_iterator, value))
-    ON_LOG(GraphDump(list);)
+
+    #ifdef DEBUGGING
+    status = ListVerifier(list);
+    if (status != ALL_CORRECT)
+        return status;
+    else
+      ON_LOG(GraphDump(list));
+    #endif
 
     return ALL_CORRECT;
 }
@@ -287,6 +319,7 @@ lst_err ListDestroy( list_t* list )
     return ALL_CORRECT;
 }
 
+//TODO - добавить проверок на массив пустых элементов
 lst_err ListVerifier( list_t* list )
 {
     if (list == NULL)
@@ -297,6 +330,7 @@ lst_err ListVerifier( list_t* list )
         return SIZE_ERROR;
     else if (list->size >= list->capacity)
         return LIST_OVERFLOW;
+
     else if (list->list_hash != CalcListHash(list))
         return HASH_CORRUPTED;
 
@@ -320,6 +354,7 @@ lst_err ListVerifier( list_t* list )
         current = list->list_arr[current].prev;
     if (current != start)
         return CYCLE_PREV_ERROR;
+
 
     return ALL_CORRECT;
 }
@@ -355,15 +390,3 @@ uint64_t Hash_djb2( const void* beg, size_t len )
     return hash;
 }
 
-uint64_t Hash_djb2_Except( const void* beg, const void* end, const void* except, size_t except_el_size )
-{
-    uint64_t hash = 5381;
-
-    for (const uint8_t* i = (const uint8_t*)beg; i <= end; i++)
-    {
-        if (i == except)
-            i += except_el_size;
-        hash =  (hash << 5) + hash + *i;
-    }
-    return hash;
-}

@@ -19,7 +19,7 @@
 #define color_lightpink  "\"#ff2edc\""
 #define color_pink       "\"#b70098\""
 
-void FPrintList ( list_t* list, FILE* file );
+void FPrintList ( list_t* list, FILE* file, const char* filename );
 void GraphDump  ( list_t* list );
 
 #endif

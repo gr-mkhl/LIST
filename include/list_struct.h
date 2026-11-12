@@ -6,13 +6,17 @@
 
 typedef int      data_t;
 typedef ssize_t  iterator_t;
-//typedef uint16_t lst_err;
-
 
 #define os           "%d"
+
 #define POISON       -67
 #define INIT_CAPACITY 16
 
+#ifdef DEBUGGING
+    #define ON_DBG(...) __VA_ARGS__
+#else
+    #define ON_DBG(...)
+#endif
 
 enum lst_err
 {

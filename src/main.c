@@ -1,11 +1,9 @@
-#define LOGGING
-
 #include <main.h>
 
 int main()
 {
     #ifdef LOGGING
-    system("rm -rf logs; mkdir -p logs/htm; mkdir -p logs/img; mkdir -p logs/txt" );
+    system("rm -rf logs; mkdir -p logs/htm; mkdir -p logs/img; mkdir -p logs/txt");
     STARTLOG()
     #endif
 
@@ -51,7 +49,7 @@ int main()
                 printf("\n\n%s\n\n", list_errors[DeleteByIterator(&list, iterator)]);
                 break;
             case '4':
-                FPrintList(&list, LOG_FILE);
+                FPrintList(&list, LOG_FILE, LOG_FILENAME);
                 GraphDump(&list);
                 break;
             case '5':

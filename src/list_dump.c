@@ -1,9 +1,9 @@
-#define LOGGING
 #include <list_dump.h>
 
-void FPrintList( list_t* list, FILE* file )
+
+void FPrintList( list_t* list, FILE* file, const char* filename )
 {
-    file = fopen(LOG_FILENAME, "a");
+    file = fopen(filename, "a");
     assert(file);
 
     fprintf(file, "__list__\n");
@@ -47,14 +47,14 @@ void GraphDump( list_t* list )
     fprintf(graph, "{\n");
     fprintf(graph, "rankdir=UD\n");
 
-    fprintf(graph, "{ rank = sink; head      [shape = Mrecord, style = filled, color = "color_pink"; fillcolor = "color_lightpink"; label = \"Head\"];}\n");
-    fprintf(graph, "{ rank = sink;   tail    [shape = Mrecord; style = filled, color = "color_pink"; fillcolor = "color_lightpink"; label = \"Tail\"];}\n");
-    fprintf(graph, "{ rank = source; frst_mt [shape = Mrecord; style = filled, color = "color_pink"; fillcolor = "color_lightpink"; label = \"First Empty\"];}\n");
-    fprintf(graph, "{ rank = source; error   [shape = hexagon; style = filled, color = "color_red"; fillcolor = "color_lightred"; label = \"Error\"];}\n");
+    fprintf(graph, "{ rank = sink; head      [shape = Mrecord, style = filled, color = " color_pink "; fillcolor = " color_lightpink "; label = \"Head\"];}\n");
+    fprintf(graph, "{ rank = sink;   tail    [shape = Mrecord; style = filled, color = " color_pink "; fillcolor = " color_lightpink "; label = \"Tail\"];}\n");
+    fprintf(graph, "{ rank = source; frst_mt [shape = Mrecord; style = filled, color = " color_pink "; fillcolor = " color_lightpink "; label = \"First Empty\"];}\n");
+    fprintf(graph, "{ rank = source; error   [shape = hexagon; style = filled, color = " color_red "; fillcolor = " color_lightred "; label = \"Error\"];}\n");
 
-    fprintf(graph, "head -> node%zd    [color = "color_pink"];\n", list->list_arr[0].next);
-    fprintf(graph, "tail -> node%zd    [color = "color_pink"];\n", list->list_arr[0].prev);
-    fprintf(graph, "frst_mt -> node%zd [color = "color_pink"];\n", list->first_empty_iterator);
+    fprintf(graph, "head -> node%zd    [color = " color_pink "];\n", list->list_arr[0].next);
+    fprintf(graph, "tail -> node%zd    [color = " color_pink "];\n", list->list_arr[0].prev);
+    fprintf(graph, "frst_mt -> node%zd [color = " color_pink "];\n", list->first_empty_iterator);
 
     for (ssize_t id = 0; id < list->capacity - 1; id++)
     {
@@ -78,7 +78,8 @@ void GraphDump( list_t* list )
             strcpy(fillcolor_str, color_lightblue);
             strcpy(color_str, color_blue);
         }
-        else if (list->list_arr[id].next < 0 || list->list_arr[id].prev < 0)
+        else if (list->list_arr[id].next < 0 || list->list_arr[id].prev < 0 ||
+                 list->list_arr[id].next >= list->capacity || list->list_arr[id].prev >= list->capacity)
         {
             strcpy(fillcolor_str, color_lightred);
             strcpy(color_str, color_red);
@@ -114,7 +115,7 @@ void GraphDump( list_t* list )
             strcpy(color_str, color_lightblue);
             strcpy(edge_style_str, "solid");
         }
-        else if (list->list_arr[id].next < 0)
+        else if (list->list_arr[id].next < 0 || list->list_arr[id].next >= list->capacity)
         {
             strcpy(color_str, color_red);
             strcpy(edge_style_str, "bold");
