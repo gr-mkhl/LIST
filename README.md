@@ -1,4 +1,4 @@
-# Doubly-linked list with graphic visualization using graphiz and DOT
+# Двусвязный список с графической визуализацией состояния с помощью graphiz и DOT
 Данный проект является реализацией кольцевых [двусвязных списков](https://en.wikipedia.org/wiki/Doubly_linked_list) c фиктивным нулевым элементом и вывода их состояния с использованием графической визуализации (graphviz + DOT)
 ![picture](/images/img1.svg)
 ## Концепция реализации
