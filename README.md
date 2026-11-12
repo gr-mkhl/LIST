@@ -1,6 +1,6 @@
 # Doubly-linked list with graphic visualization using graphiz and DOT
 Данный проект является реализацией кольцевых [двусвязных списков](https://en.wikipedia.org/wiki/Doubly_linked_list) c фиктивным нулевым элементом и вывода их состояния с использованием графической визуализации (graphviz + DOT)
-![picture](/LIST/images/img1.svg)
+![picture](/images/img1.svg)
 ## Концепция реализации
 Основным отличием данной реализации от общепринятой(например контейнер list в стандартной библиотеке языка C++) является хранение всех элементов списка в одном массиве и осуществление доступа к элементам по их индексам в массиве (итераторам). Иначе говоря, каждый элемент хранит не указатель на следующий и предыдущий элементы в списке, а их индексы в массиве.
 
@@ -137,10 +137,10 @@ fprintf(stderr, "%s\n", list_errors[status]);
 Графический "дамп" списка умеет явно подчеркивать следующие ошибки:
 
 Поле next или prev имеет отрицательное значение:
-![img_error1.svg](/LIST/images/img_error1.svg)
+![img_error1.svg](/images/img_error1.svg)
 
 Поле prev или next указывают на элемент не входящий в список:
-![img_error2.svg](/LIST/images/img_error2.svg)
+![img_error2.svg](/images/img_error2.svg)
 
 
 ## Установка и компиляция
@@ -158,4 +158,4 @@ fprintf(stderr, "%s\n", list_errors[status]);
 Файл с логами находится по пути `/logs/htm/LOG.htm`.
 
 Пример того, как выглядит файл с логами:
-![log.png](/LIST/images/log.png)
+![log.png](/images/log.png)
