@@ -36,6 +36,7 @@ enum lst_err
     HASH_CORRUPTED   = 11
 };
 
+
 extern const char* list_errors[];
 
 struct node_t
@@ -45,13 +46,15 @@ struct node_t
     iterator_t prev;
 };
 
+
 struct list_t
 {
-    node_t* list_arr;
+    struct node_t* list_arr;
     ssize_t size;
     ssize_t capacity;
     iterator_t first_empty_iterator;
     uint64_t list_hash;
 };
+
 
 #endif

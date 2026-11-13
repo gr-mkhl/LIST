@@ -5,15 +5,15 @@
 #include <log.h>
 
 int     StartTestSystem();
-lst_err CapacityErrorVerifier();
-lst_err SizeErrorVerifier();
-lst_err IncorrectArgumentVerifier();
-lst_err ListOverflowVerifier();
-lst_err NullListPtrVerifier();
-lst_err EmptyListVerifier();
-lst_err ListOOMVerifier();
-lst_err LinkErrorVerifier();
-lst_err HashCorruptionError();
-lst_err ListDumpTest();
+enum lst_err CapacityErrorVerifier();
+enum lst_err SizeErrorVerifier();
+enum lst_err IncorrectArgumentVerifier();
+enum lst_err ListOverflowVerifier();
+enum lst_err NullListPtrVerifier();
+enum lst_err EmptyListVerifier();
+enum lst_err ListOOMVerifier();
+enum lst_err LinkErrorVerifier();
+enum lst_err HashCorruptionError();
+enum lst_err ListDumpTest();
 
 #endif

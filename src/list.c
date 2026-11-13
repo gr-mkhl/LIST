@@ -34,7 +34,7 @@ const char* list_errors[] =
     [HASH_CORRUPTED]      = "Hash has been corrupted"
 };
 
-lst_err ListInit( list_t* list, ssize_t init_capacity )
+enum lst_err ListInit( struct list_t* list, ssize_t init_capacity )
 {
     if (list == NULL)
         return NULL_LIST_PTR;
@@ -42,7 +42,7 @@ lst_err ListInit( list_t* list, ssize_t init_capacity )
     if (init_capacity < 0)
         return INCORRECT_ARG;
 
-    list->list_arr = (node_t*)calloc((size_t)(init_capacity), sizeof(node_t));
+    list->list_arr = (struct node_t*)calloc((size_t)(init_capacity), sizeof(struct node_t));
     if (list->list_arr == NULL)
         return LIST_OOM;
 
@@ -75,48 +75,48 @@ lst_err ListInit( list_t* list, ssize_t init_capacity )
     return ALL_CORRECT;
 }
 
-uint64_t CalcListHash( list_t* list )
+uint64_t CalcListHash( struct list_t* list )
 {
-    uint64_t struct_hash = Hash_djb2(list, sizeof(list_t) - sizeof(uint64_t));
-    uint64_t array_hash  = Hash_djb2(&list->list_arr[0], (size_t)list->capacity * sizeof(node_t));
+    uint64_t struct_hash = Hash_djb2(list, sizeof(struct list_t) - sizeof(uint64_t));
+    uint64_t array_hash  = Hash_djb2(&list->list_arr[0], (size_t)list->capacity * sizeof(struct node_t));
     list->list_hash = struct_hash ^ array_hash;
 
     return struct_hash ^ array_hash;
 }
 
-iterator_t GetHead( list_t* list )
+iterator_t GetHead( struct list_t* list )
 {
     ON_LOG(LOG("На голову списка указывает итератор {%zd}", list->list_arr[0].next))
     return list->list_arr[0].next;
 }
 
 
-iterator_t GetTail( list_t* list )
+iterator_t GetTail( struct list_t* list )
 {
     ON_LOG(LOG("На хвост списка указывает итератор {%zd}", list->list_arr[0].prev))
     return list->list_arr[0].prev;
 }
 
 
-iterator_t Next( list_t* list, iterator_t iterator )
+iterator_t Next( struct list_t* list, iterator_t iterator )
 {
     ON_LOG(LOG("На следующий элемент списка указывает итератор {%zd}", list->list_arr[iterator].next))
     return list->list_arr[iterator].next;
 }
 
 
-iterator_t Prev( list_t* list, iterator_t iterator )
+iterator_t Prev( struct list_t* list, iterator_t iterator )
 {
     ON_LOG(LOG("На предыдущий элемент списка указывает итератор {%zd}", list->list_arr[iterator].prev))
     return list->list_arr[iterator].prev;
 }
 
 // This is not list interface function, you shouldn't use it alone
-lst_err ReallocListUp( list_t* list )
+enum lst_err ReallocListUp( struct list_t* list )
 {
     ssize_t new_capacity = (list->capacity == 0 ? INIT_CAPACITY : list->capacity * 2);
 
-    node_t* new_list_arr = (node_t*) realloc(list->list_arr, ((size_t)(new_capacity) * sizeof(node_t)));
+    struct node_t* new_list_arr = (struct node_t*) realloc(list->list_arr, ((size_t)(new_capacity) * sizeof(struct node_t)));
     if (new_list_arr == NULL)
         return LIST_OOM;
 
@@ -143,7 +143,7 @@ lst_err ReallocListUp( list_t* list )
     ON_LOG(LOG("Список расширен с capacity = {%zd} до new_capacity = {%zd}", list->capacity / 2, new_capacity))
 
     #ifdef DEBUGGING
-    lst_err status = ListVerifier(list);
+    enum lst_err status = ListVerifier(list);
     if (status != ALL_CORRECT)
         return status;
     else
@@ -153,7 +153,7 @@ lst_err ReallocListUp( list_t* list )
     return ALL_CORRECT;
 }
 
-lst_err DeleteByIterator( list_t* list, iterator_t iterator_to_delete )
+enum lst_err DeleteByIterator( struct list_t* list, iterator_t iterator_to_delete )
 {
     if (list->size == 0)
         return EMPTY_LIST;
@@ -161,9 +161,11 @@ lst_err DeleteByIterator( list_t* list, iterator_t iterator_to_delete )
     if (!(0 < iterator_to_delete && iterator_to_delete <= list->size))
         return INCORRECT_ARG;
 
-    lst_err status = ListVerifier(list);
+    #ifdef DEBUGGING
+    enum lst_err status = ListVerifier(list);
     if (status != ALL_CORRECT)
         return status;
+    #endif
 
 // достаем элемент из списка
     list->list_arr[list->list_arr[iterator_to_delete].next].prev = list->list_arr[iterator_to_delete].prev;
@@ -192,20 +194,20 @@ lst_err DeleteByIterator( list_t* list, iterator_t iterator_to_delete )
     return ALL_CORRECT;
 }
 
-lst_err InsertAfter( list_t* list, iterator_t prev_iterator, data_t value )
+enum lst_err InsertAfter( struct list_t* list, iterator_t prev_iterator, data_t value )
 {
     if (!(0 <= prev_iterator && prev_iterator <= list->size))
         return INCORRECT_ARG;
 
     #ifdef DEBUGGING
-    lst_err status = ListVerifier(list);
+    enum lst_err status = ListVerifier(list);
     if (status != ALL_CORRECT)
         return status;
     #endif
 
     if (list->size == list->capacity - 1)
     {
-        lst_err realloc_status = ReallocListUp(list);
+        enum lst_err realloc_status = ReallocListUp(list);
         if (realloc_status != ALL_CORRECT)
             return realloc_status;
     }
@@ -242,13 +244,13 @@ lst_err InsertAfter( list_t* list, iterator_t prev_iterator, data_t value )
     return ALL_CORRECT;
 }
 
-lst_err InsertBefore( list_t* list, iterator_t next_iterator, data_t value )
+enum lst_err InsertBefore( struct list_t* list, iterator_t next_iterator, data_t value )
 {
     if (!(0 <= next_iterator && next_iterator <= list->size))
         return INCORRECT_ARG;
 
     #ifdef DEBUGGING
-    lst_err status = ListVerifier(list);
+    enum lst_err status = ListVerifier(list);
     if (status != ALL_CORRECT)
         return status;
     #endif
@@ -256,7 +258,7 @@ lst_err InsertBefore( list_t* list, iterator_t next_iterator, data_t value )
     if (list->size == list->capacity - 1)
     {
 
-        lst_err realloc_status = ReallocListUp(list);
+        enum lst_err realloc_status = ReallocListUp(list);
         if (realloc_status != ALL_CORRECT)
             return realloc_status;
     }
@@ -294,7 +296,7 @@ lst_err InsertBefore( list_t* list, iterator_t next_iterator, data_t value )
 }
 
 
-lst_err ListDestroy( list_t* list )
+enum lst_err ListDestroy( struct list_t* list )
 {
     if (list == NULL)
         return NULL_LIST_PTR;
@@ -320,7 +322,7 @@ lst_err ListDestroy( list_t* list )
 }
 
 //TODO - добавить проверок на массив пустых элементов
-lst_err ListVerifier( list_t* list )
+enum lst_err ListVerifier( struct list_t* list )
 {
     if (list == NULL)
         return NULL_LIST_PTR;
@@ -360,22 +362,22 @@ lst_err ListVerifier( list_t* list )
 }
 
 
-lst_err InsertToHead( list_t* list, data_t value )
+enum lst_err InsertToHead( struct list_t* list, data_t value )
 {
     return InsertAfter(list, 0, value);
 }
 
-lst_err InsertToTail( list_t* list, data_t value )
+enum lst_err InsertToTail( struct list_t* list, data_t value )
 {
     return InsertBefore(list, 0, value);
 }
 
-lst_err DeleteFromHead( list_t* list )
+enum lst_err DeleteFromHead( struct list_t* list )
 {
     return DeleteByIterator(list, list->list_arr[0].next);
 }
 
-lst_err DeleteFromTail( list_t* list )
+enum lst_err DeleteFromTail( struct list_t* list )
 {
    return DeleteByIterator(list, list->list_arr[0].prev);
 }

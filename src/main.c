@@ -7,7 +7,7 @@ int main()
     STARTLOG()
     #endif
 
-    list_t list = {};
+    struct list_t list = {};
     data_t value = 0;
     ssize_t capacity = 0;
     ssize_t list_index = 0;
@@ -57,17 +57,15 @@ int main()
                 break;
             case 't':
             {
-                ListDumpTest();
-                    printf("CPP standart version: %ld\n", __cplusplus);
-                // int result = StartTestSystem();
-                // if (result == -1)
-                // {
-                //     printf("Tests completed correctly\n");
-                // }
-                // else
-                // {
-                //     printf("Test %d failed\n", result);
-                // }
+                int result = StartTestSystem();
+                if (result == -1)
+                {
+                    printf("Tests completed correctly\n");
+                }
+                else
+                {
+                    printf("Test %d failed\n", result);
+                }
                 break;
             }
             default:

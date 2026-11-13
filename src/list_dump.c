@@ -1,7 +1,7 @@
 #include <list_dump.h>
 
 
-void FPrintList( list_t* list, FILE* file, const char* filename )
+void FPrintList( struct list_t* list, FILE* file, const char* filename )
 {
     file = fopen(filename, "a");
     assert(file);
@@ -33,7 +33,7 @@ void FPrintList( list_t* list, FILE* file, const char* filename )
     fclose(file);
 }
 
-void GraphDump( list_t* list )
+void GraphDump( struct list_t* list )
 {
     char graph_file_name[70] = {};
     char time_buffer[20] = {};
